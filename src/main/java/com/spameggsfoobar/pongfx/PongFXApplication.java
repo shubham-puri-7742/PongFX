@@ -79,9 +79,11 @@ public class PongFXApplication extends Application {
             ballYPos += ballYSpeed;
 
             // AI Player logic
+            // ball on the left 3/4 of the screen
             if (ballXPos < width - width / 4) {
                 player2YPos = ballYPos - playerHeight / 2;
-            } else {
+            } else { // right 1/4 of the screen (with the movement limited to 1 unit per iteration, this gives the AI some room to fail when the ball is really fast)
+                // move 1 unit up if the ball is above the paddle, else one unit down
                 player2YPos = (ballYPos > player2YPos + playerHeight / 2) ? player2YPos += 1 : player2YPos - 1;
             }
 
@@ -102,21 +104,26 @@ public class PongFXApplication extends Application {
         
         // confine ball to the canvas. We don't need to do this for x because going out of bounds horizontally = someone scored a point
         if (ballYPos > height || ballYPos < 0) {
+            // reflect y
             ballYSpeed *= -1;
         }
         
         // scoring
+        // P1 missed
         if (ballXPos < player1XPos - playerWidth) {
+            // = P2 scored
             ++scoreP2;
             gameStarted = false;
         }
+        // P2 missed
         if (ballXPos > player2XPos + playerWidth) {
+            // = P1 scored
             ++scoreP1;
             gameStarted = false;
         }
         
         // increase the ball speed each time the ball is hit
-        if (((ballXPos + ballRadius > player2XPos) && ballYPos >= player2YPos && ballYPos <= player2YPos + playerHeight) || ((ballXPos < player1XPos + playerWidth) && ballYPos >= player1YPos && ballYPos <= player1YPos + playerHeight)) {
+        if (((ballXPos < player1XPos + playerWidth) && ballYPos >= player1YPos && ballYPos <= player1YPos + playerHeight) || ((ballXPos + ballRadius > player2XPos) && ballYPos >= player2YPos && ballYPos <= player2YPos + playerHeight)) {
             // add a magnitude of 1 unit in the current direction
             ballYSpeed += 1 * Math.signum(ballYSpeed);
             ballXSpeed += 1 * Math.signum(ballXSpeed);
